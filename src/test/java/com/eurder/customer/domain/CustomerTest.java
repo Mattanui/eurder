@@ -1,5 +1,6 @@
 package com.eurder.customer.domain;
 
+import com.eurder.shared.Email;
 import com.eurder.shared.InvalidInputException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -1,6 +1,4 @@
-package com.eurder.customer.domain;
-
-import com.eurder.shared.InvalidInputException;
+package com.eurder.shared;
 
 import java.util.Locale;
 import java.util.regex.Pattern;

@@ -7,10 +7,14 @@ public final class Validation {
     }
 
     public static String requireText(String value, String fieldName) {
+        return requireNonBlank(value, fieldName).trim();
+    }
+
+    public static String requireNonBlank(String value, String fieldName) {
         if (value == null || value.isBlank()) {
             throw missing(fieldName);
         }
-        return value.trim();
+        return value;
     }
 
     public static <T> T requireValue(T value, String fieldName) {

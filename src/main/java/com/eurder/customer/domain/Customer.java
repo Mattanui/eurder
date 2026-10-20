@@ -1,5 +1,7 @@
 package com.eurder.customer.domain;
 
+import com.eurder.shared.Email;
+
 import java.util.UUID;
 
 import static com.eurder.shared.Validation.requireText;

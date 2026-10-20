@@ -1,5 +1,6 @@
 package com.eurder.customer.domain;
 
+import com.eurder.shared.Email;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
