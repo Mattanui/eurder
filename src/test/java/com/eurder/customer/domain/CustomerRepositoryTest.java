@@ -1,7 +1,7 @@
 package com.eurder.customer.domain;
 
-import com.eurder.shared.Email;
 import org.junit.jupiter.api.Test;
+import static com.eurder.customer.domain.CustomerTestData.aCustomer;
 
 import java.util.UUID;
 
@@ -25,10 +25,4 @@ class CustomerRepositoryTest {
         assertThat(repository.findById(UUID.randomUUID())).isEmpty();
     }
 
-    private static Customer aCustomer() {
-        return new Customer("Jimmy", "Hendrix",
-                new Email("jimmy.hendrix@dhemail.com"),
-                new Address("Rue de la guitare", "10A", "1000", "Brussels", "Belgium"),
-                new PhoneNumber("+32", "485652311"));
-    }
 }

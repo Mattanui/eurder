@@ -16,8 +16,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserTest {
 
-    private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder(4);
-    private static final UUID ID = UUID.randomUUID();
+    private static final PasswordEncoder PASSWORD_ENCODER = TestPasswordEncoder.FAST_BCRYPT;    private static final UUID ID = UUID.randomUUID();
     private static final Email EMAIL = new Email("jimmy.hendrix@dhemail.com");
 
     @Test

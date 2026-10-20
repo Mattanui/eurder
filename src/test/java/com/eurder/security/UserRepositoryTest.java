@@ -12,8 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class UserRepositoryTest {
 
-    private static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder(4);
-
+    private static final PasswordEncoder PASSWORD_ENCODER = TestPasswordEncoder.FAST_BCRYPT;
     private final UserRepository repository = new UserRepository();
 
     @Test
