@@ -29,4 +29,15 @@ class OpenApiDocumentationAcceptanceTest {
                 .statusCode(200)
                 .body("info.title", equalTo("Eurder API"));
     }
+
+    @Test
+    void openApiDocumentation_declaresTheBasicAuthenticationScheme() {
+        given()
+                .when()
+                .get("/v3/api-docs")
+                .then()
+                .statusCode(200)
+                .body("components.securitySchemes.basicAuth.type", equalTo("http"))
+                .body("components.securitySchemes.basicAuth.scheme", equalTo("basic"));
+    }
 }
