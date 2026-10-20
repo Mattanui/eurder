@@ -1,6 +1,7 @@
 package com.eurder.item.domain;
 
 import org.junit.jupiter.api.Test;
+import static com.eurder.item.domain.ItemTestData.anItem;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -25,8 +26,4 @@ class ItemRepositoryTest {
         assertThat(repository.findById(UUID.randomUUID())).isEmpty();
     }
 
-    private static Item anItem() {
-        return new Item("Fender Stratocaster", "Electric guitar with a maple neck",
-                new Price(new BigDecimal("699.95")), 12);
-    }
 }
