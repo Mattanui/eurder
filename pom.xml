@@ -24,25 +24,12 @@
 	</properties>
 
 	<dependencies>
+		<!-- ===== Production ===== -->
+
 		<!-- REST API: Spring MVC + embedded Tomcat + Jackson (JSON) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
-		</dependency>
-
-		<!-- Tests: JUnit Jupiter, AssertJ, Mockito, Hamcrest + Spring MVC test support -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webmvc-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- Tests: real HTTP calls against the running application -->
-		<dependency>
-			<groupId>io.rest-assured</groupId>
-			<artifactId>rest-assured</artifactId>
-			<version>${rest-assured.version}</version>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- OpenAPI documentation (/v3/api-docs) + Swagger UI -->
@@ -50,6 +37,29 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${springdoc.version}</version>
+		</dependency>
+
+		<!-- Password hashing (BCrypt) only: NOT the Spring Security framework (no filters, no auto-configuration) -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
+		</dependency>
+
+		<!-- ===== Tests ===== -->
+
+		<!-- JUnit Jupiter, AssertJ, Mockito, Hamcrest + Spring MVC test support -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Real HTTP calls against the running application -->
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>${rest-assured.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
