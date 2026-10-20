@@ -8,8 +8,19 @@ public final class Validation {
 
     public static String requireText(String value, String fieldName) {
         if (value == null || value.isBlank()) {
-            throw new InvalidInputException(fieldName + " must be provided");
+            throw missing(fieldName);
         }
         return value.trim();
+    }
+
+    public static <T> T requireValue(T value, String fieldName) {
+        if (value == null) {
+            throw missing(fieldName);
+        }
+        return value;
+    }
+
+    private static InvalidInputException missing(String fieldName) {
+        return new InvalidInputException(fieldName + " must be provided");
     }
 }
