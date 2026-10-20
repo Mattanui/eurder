@@ -41,6 +41,10 @@ public class User {
         return rawPassword != null && passwordEncoder.matches(rawPassword, passwordHash);
     }
 
+    public boolean hasAccessTo(Feature feature) {
+        return role.hasAccessTo(feature);
+    }
+
     public UUID getId() {
         return id;
     }

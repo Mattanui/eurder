@@ -2,6 +2,8 @@ package com.eurder.infrastructure;
 
 import com.eurder.security.EmailAlreadyInUseException;
 import com.eurder.shared.InvalidInputException;
+import com.eurder.security.ForbiddenException;
+import com.eurder.security.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +37,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleUnexpectedException(Exception exception) {
         log.error("Unexpected error", exception);
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ProblemDetail> handleUnauthorized(UnauthorizedException exception) {
+        log.warn("Unauthorized access: Invalid or missing credentials ({})", exception.getMessage());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+                "Invalid or missing credentials");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"eurder\", charset=\"UTF-8\"")
+                .body(problem);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ProblemDetail handleForbidden(ForbiddenException exception) {
+        log.warn("Forbidden access: {}", exception.getMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "Access denied");
     }
 
     @Override

@@ -109,4 +109,18 @@ class UserTest {
                 .isInstanceOf(InvalidInputException.class)
                 .hasMessage("Role must be provided");
     }
+
+    @Test
+    void hasAccessTo_withAFeatureOfItsRole_returnsTrue() {
+        User admin = User.create(ID, EMAIL, "aSecret", Role.ADMIN, PASSWORD_ENCODER);
+
+        assertThat(admin.hasAccessTo(Feature.CREATE_ITEM)).isTrue();
+    }
+
+    @Test
+    void hasAccessTo_withAFeatureOutsideItsRole_returnsFalse() {
+        User customer = User.create(ID, EMAIL, "aSecret", Role.CUSTOMER, PASSWORD_ENCODER);
+
+        assertThat(customer.hasAccessTo(Feature.CREATE_ITEM)).isFalse();
+    }
 }
