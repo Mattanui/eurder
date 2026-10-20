@@ -57,7 +57,7 @@ class CreateCustomerAcceptanceTest {
                 .body("firstName", equalTo("Jimmy"))
                 .body("lastName", equalTo("Hendrix"))
                 .body("email", equalTo("jimmy.hendrix@dhemail.com"))
-                .body("address.street", equalTo("Rue de la loi"))
+                .body("address.street", equalTo("Rue de la guitare"))
                 .body("address.houseNumber", equalTo("10A"))
                 .body("address.postalCode", equalTo("1000"))
                 .body("address.city", equalTo("Brussels"))
