@@ -1,5 +1,6 @@
 package com.eurder.eurder;
 
+import com.eurder.AcceptanceTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.config.JsonPathConfig.NumberReturnType;
@@ -7,7 +8,6 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AcceptanceTest
 class OrderItemsAcceptanceTest {
 
     private static final String CUSTOMER_PASSWORD = "customerSecret";
