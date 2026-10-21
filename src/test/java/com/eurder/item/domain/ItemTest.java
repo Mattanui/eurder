@@ -3,6 +3,7 @@ package com.eurder.item.domain;
 import com.eurder.shared.InvalidInputException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -102,5 +103,44 @@ class ItemTest {
         assertThatThrownBy(() -> new Item(NAME, DESCRIPTION, PRICE, -1))
                 .isInstanceOf(InvalidInputException.class)
                 .hasMessage("Stock must not be negative");
+    }
+
+    @ParameterizedTest(name = "stock {0}, requested {1} -> in stock: {2}")
+    @CsvSource({
+            "10, 2,  true",
+            "10, 10, true",
+            "10, 11, false"
+    })
+    void isInStock_comparesTheStockWithTheRequestedAmount(int stock, int requestedAmount, boolean expected) {
+        Item item = new Item(NAME, DESCRIPTION, PRICE, stock);
+
+        assertThat(item.isInStock(requestedAmount)).isEqualTo(expected);
+    }
+
+    @Test
+    void decreaseStock_removesTheAmountFromTheStock() {
+        Item item = new Item(NAME, DESCRIPTION, PRICE, 10);
+
+        item.decreaseStock(3);
+
+        assertThat(item.getStock()).isEqualTo(7);
+    }
+
+    @Test
+    void decreaseStock_withMoreThanTheStock_stopsAtZero() {
+        Item item = new Item(NAME, DESCRIPTION, PRICE, 1);
+
+        item.decreaseStock(3);
+
+        assertThat(item.getStock()).isZero();
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1})
+    void decreaseStock_withANonPositiveAmount_isAProgrammingError(int amount) {
+        Item item = new Item(NAME, DESCRIPTION, PRICE, 10);
+
+        assertThatThrownBy(() -> item.decreaseStock(amount))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }

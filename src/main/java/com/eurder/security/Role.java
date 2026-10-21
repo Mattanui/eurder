@@ -4,7 +4,7 @@ import java.util.Set;
 
 public enum Role {
     ADMIN(Feature.CREATE_ITEM),
-    CUSTOMER();
+    CUSTOMER(Feature.ORDER_ITEMS);
 
     private final Set<Feature> features;
 

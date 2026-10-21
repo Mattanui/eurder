@@ -10,8 +10,7 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-import java.util.UUID;
-
+import static com.eurder.EurderTestClient.uniqueEmail;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -106,10 +105,6 @@ class CreateCustomerAcceptanceTest {
                 .statusCode(400);
 
         assertThat(output).contains("Invalid input: Email has an invalid format: still-not-an-email");
-    }
-
-    private static String uniqueEmail() {
-        return "jimmy." + UUID.randomUUID() + "@dhemail.com";
     }
 
     private static String customerJson(String email) {

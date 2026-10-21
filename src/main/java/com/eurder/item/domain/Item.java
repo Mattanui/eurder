@@ -15,7 +15,8 @@ public class Item {
     private final String name;
     private final String description;
     private final Price price;
-    private final int stock;
+
+    private int stock;
 
     public Item(String name, String description, Price price, Integer stock) {
         this.id = UUID.randomUUID();
@@ -40,6 +41,17 @@ public class Item {
             throw new InvalidInputException("Stock must not be negative");
         }
         return stock;
+    }
+
+    public boolean isInStock(int requestedAmount) {
+        return stock >= requestedAmount;
+    }
+
+    public void decreaseStock(int amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount to decrease must be positive, but was " + amount);
+        }
+        stock = Math.max(0, stock - amount);
     }
 
     public UUID getId() {
