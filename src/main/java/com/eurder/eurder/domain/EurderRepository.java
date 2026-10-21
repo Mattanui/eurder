@@ -1,10 +1,13 @@
 package com.eurder.eurder.domain;
 
+import org.springframework.stereotype.Repository;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class EurderRepository {
 
     private final Map<UUID, Eurder> eurdersById = new ConcurrentHashMap<>();

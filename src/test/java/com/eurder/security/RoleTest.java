@@ -15,4 +15,14 @@ class RoleTest {
     void customer_hasNoAccessToCreateItem() {
         assertThat(Role.CUSTOMER.hasAccessTo(Feature.CREATE_ITEM)).isFalse();
     }
+
+    @Test
+    void customer_hasAccessToOrderItems() {
+        assertThat(Role.CUSTOMER.hasAccessTo(Feature.ORDER_ITEMS)).isTrue();
+    }
+
+    @Test
+    void admin_hasNoAccessToOrderItems() {
+        assertThat(Role.ADMIN.hasAccessTo(Feature.ORDER_ITEMS)).isFalse();
+    }
 }
