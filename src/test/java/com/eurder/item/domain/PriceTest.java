@@ -66,4 +66,26 @@ class PriceTest {
                 .isInstanceOf(InvalidInputException.class)
                 .hasMessage("Price must not have more than 2 decimals");
     }
+
+    @Test
+    void multiply_returnsThePriceForTheGivenQuantity() {
+        Price unitPrice = new Price(new BigDecimal("699.95"));
+
+        assertThat(unitPrice.multiply(2)).isEqualTo(new Price(new BigDecimal("1399.90")));
+    }
+
+    @Test
+    void add_returnsTheSumOfBothPrices() {
+        Price first = new Price(new BigDecimal("1399.90"));
+        Price second = new Price(new BigDecimal("149.97"));
+
+        assertThat(first.add(second)).isEqualTo(new Price(new BigDecimal("1549.87")));
+    }
+
+    @Test
+    void zero_isTheNeutralElementOfAddition() {
+        Price price = new Price(new BigDecimal("699.95"));
+
+        assertThat(Price.ZERO.add(price)).isEqualTo(price);
+    }
 }

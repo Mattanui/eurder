@@ -13,8 +13,9 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
+import static com.eurder.EurderTestClient.registerCustomer;
+import static com.eurder.EurderTestClient.uniqueEmail;
 import static io.restassured.RestAssured.given;
 import static io.restassured.config.JsonConfig.jsonConfig;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,7 +88,7 @@ class CreateItemAcceptanceTest {
 
     @Test
     void createItem_asCustomer_returnsForbidden() {
-        String customerEmail = "jimmy." + UUID.randomUUID() + "@dhemail.com";
+        String customerEmail = uniqueEmail();
         registerCustomer(customerEmail, "customerSecret");
 
         given()
@@ -138,19 +139,5 @@ class CreateItemAcceptanceTest {
                 """.formatted(price, stock);
     }
 
-    private static void registerCustomer(String email, String password) {
-        String customerJson = """
-                {
-                  "firstName": "Jimmy",
-                  "lastName": "Hendrix",
-                  "email": "%s",
-                  "password": "%s",
-                  "address": {"street": "Rue de la guitare", "houseNumber": "10A", "postalCode": "1000",
-                              "city": "Brussels", "country": "Belgium"},
-                  "phoneNumber": {"countryCode": "+32", "number": "485652311"}
-                }
-                """.formatted(email, password);
-        given().contentType(ContentType.JSON).body(customerJson).post("/customers")
-                .then().statusCode(201);
-    }
+
 }
