@@ -1,5 +1,6 @@
 package com.eurder.customer;
 
+import com.eurder.AcceptanceTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AcceptanceTest
 @ExtendWith(OutputCaptureExtension.class)
 class CreateCustomerAcceptanceTest {
 
