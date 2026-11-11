@@ -1,13 +1,17 @@
 package com.eurder.eurder.service;
 
+import com.eurder.PersistenceTest;
+import com.eurder.customer.domain.CustomerRepository;
 import com.eurder.eurder.domain.Eurder;
 import com.eurder.eurder.domain.EurderRepository;
 import com.eurder.item.domain.Item;
 import com.eurder.item.domain.ItemRepository;
 import com.eurder.item.domain.Price;
+import com.eurder.security.UserRepository;
 import com.eurder.shared.InvalidInputException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -17,25 +21,38 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
+import static com.eurder.customer.domain.CustomerTestData.aPersistedCustomer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@PersistenceTest
 class EurderServiceTest {
 
     private static final ZoneId BRUSSELS = ZoneId.of("Europe/Brussels");
     private static final Clock OCTOBER_21_AT_NOON = Clock.fixed(Instant.parse("2026-10-21T10:00:00Z"), BRUSSELS);
     private static final UUID CUSTOMER_ID = UUID.randomUUID();
 
-    private final ItemRepository itemRepository = new ItemRepository();
-    private final EurderRepository eurderRepository = new EurderRepository();
-    private final EurderService eurderService =
-            new EurderService(eurderRepository, itemRepository, OCTOBER_21_AT_NOON);
+    @Autowired
+    private ItemRepository itemRepository;
 
+    @Autowired
+    private EurderRepository eurderRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    private EurderService eurderService;
+    private UUID customerId;
     private Item guitar;
     private Item strap;
 
     @BeforeEach
     void setUp() {
+        eurderService = new EurderService(eurderRepository, itemRepository, OCTOBER_21_AT_NOON);
+        customerId = aPersistedCustomer(userRepository, customerRepository).getId();
         guitar = itemRepository.save(new Item("Fender Stratocaster", "Electric guitar",
                 new Price(new BigDecimal("699.95")), 10));
         strap = itemRepository.save(new Item("Leather strap", "Brown leather strap",
@@ -44,7 +61,7 @@ class EurderServiceTest {
 
     @Test
     void placeEurder_computesOrderAndShippingDatesFromTheClock() {
-        Eurder eurder = eurderService.placeEurder(CUSTOMER_ID, List.of(
+        Eurder eurder = eurderService.placeEurder(customerId, List.of(
                 new ItemGroupRequest(guitar.getId(), 2),
                 new ItemGroupRequest(strap.getId(), 3)));
 
@@ -55,15 +72,15 @@ class EurderServiceTest {
 
     @Test
     void placeEurder_savesTheEurderForTheCustomer() {
-        Eurder eurder = eurderService.placeEurder(CUSTOMER_ID, List.of(new ItemGroupRequest(guitar.getId(), 1)));
+        Eurder eurder = eurderService.placeEurder(customerId, List.of(new ItemGroupRequest(guitar.getId(), 1)));
 
-        assertThat(eurder.getCustomerId()).isEqualTo(CUSTOMER_ID);
-        assertThat(eurderRepository.findById(eurder.getId())).containsSame(eurder);
+        assertThat(eurder.getCustomerId()).isEqualTo(customerId);
+        assertThat(eurderRepository.findById(eurder.getId())).contains(eurder);
     }
 
     @Test
     void placeEurder_decreasesTheStockOfTheOrderedItems() {
-        eurderService.placeEurder(CUSTOMER_ID, List.of(
+        eurderService.placeEurder(customerId, List.of(
                 new ItemGroupRequest(guitar.getId(), 2),
                 new ItemGroupRequest(strap.getId(), 3)));
 
@@ -75,7 +92,7 @@ class EurderServiceTest {
     void placeEurder_withAnUnknownItem_isRejected_andChangesNoStock() {
         UUID unknownItemId = UUID.randomUUID();
 
-        assertThatThrownBy(() -> eurderService.placeEurder(CUSTOMER_ID, List.of(
+        assertThatThrownBy(() -> eurderService.placeEurder(customerId, List.of(
                 new ItemGroupRequest(guitar.getId(), 2),
                 new ItemGroupRequest(unknownItemId, 1))))
                 .isInstanceOf(InvalidInputException.class)
@@ -85,7 +102,7 @@ class EurderServiceTest {
 
     @Test
     void placeEurder_withTheSameItemTwice_isRejected_andChangesNoStock() {
-        assertThatThrownBy(() -> eurderService.placeEurder(CUSTOMER_ID, List.of(
+        assertThatThrownBy(() -> eurderService.placeEurder(customerId, List.of(
                 new ItemGroupRequest(guitar.getId(), 1),
                 new ItemGroupRequest(guitar.getId(), 2))))
                 .isInstanceOf(InvalidInputException.class)
@@ -95,7 +112,7 @@ class EurderServiceTest {
 
     @Test
     void placeEurder_withAnInvalidAmount_isRejected_andChangesNoStock() {
-        assertThatThrownBy(() -> eurderService.placeEurder(CUSTOMER_ID, List.of(
+        assertThatThrownBy(() -> eurderService.placeEurder(customerId, List.of(
                 new ItemGroupRequest(guitar.getId(), 2),
                 new ItemGroupRequest(strap.getId(), 0))))
                 .isInstanceOf(InvalidInputException.class)
@@ -109,7 +126,7 @@ class EurderServiceTest {
         Clock justAfterMidnightInBrussels = Clock.fixed(Instant.parse("2026-10-21T22:30:00Z"), BRUSSELS);
         EurderService service = new EurderService(eurderRepository, itemRepository, justAfterMidnightInBrussels);
 
-        Eurder eurder = service.placeEurder(CUSTOMER_ID, List.of(new ItemGroupRequest(guitar.getId(), 1)));
+        Eurder eurder = service.placeEurder(customerId, List.of(new ItemGroupRequest(guitar.getId(), 1)));
 
         assertThat(eurder.getOrderDate()).isEqualTo(LocalDate.of(2026, 10, 22));
     }

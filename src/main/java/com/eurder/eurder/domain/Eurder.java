@@ -1,22 +1,34 @@
 package com.eurder.eurder.domain;
 
+import com.eurder.customer.domain.Customer;
 import com.eurder.item.domain.Price;
 import com.eurder.shared.InvalidInputException;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static com.eurder.shared.Validation.requireValue;
 
+@Entity
+@Table(name = "eurder")
 public class Eurder {
 
-    private final UUID id;
-    private final UUID customerId;
-    private final LocalDate orderDate;
-    private final List<ItemGroup> itemGroups;
+    @Id
+    private UUID id;
+
+    private UUID customerId;
+
+    private LocalDate orderDate;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "item_group", joinColumns = @JoinColumn(name = "eurder_id"))
+    @OrderColumn(name = "line_number")
+    @AttributeOverride(name = "unitPrice.amount", column = @Column(name = "unit_price"))
+    private List<ItemGroup> itemGroups = new ArrayList<>();
+
+    protected Eurder() {
+    }
 
     public Eurder(UUID customerId, LocalDate orderDate, List<ItemGroup> itemGroups) {
         this.id = UUID.randomUUID();
@@ -59,5 +71,18 @@ public class Eurder {
 
     public List<ItemGroup> getItemGroups() {
         return itemGroups;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        return other instanceof Eurder that && id.equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

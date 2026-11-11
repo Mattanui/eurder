@@ -4,6 +4,7 @@ import com.eurder.shared.Email;
 import com.eurder.shared.InvalidInputException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SecurityService {
@@ -16,6 +17,7 @@ public class SecurityService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional(readOnly = true)
     public User validateAccess(String authorizationHeader, Feature feature) {
         User user = authenticate(authorizationHeader);
         if (!user.hasAccessTo(feature)) {

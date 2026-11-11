@@ -1,26 +1,22 @@
 package com.eurder.security;
 
 import com.eurder.shared.Email;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.UUID;
 
-@Repository
-public class UserRepository {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-    private final Map<Email, User> usersByEmail = new ConcurrentHashMap<>();
+    Optional<User> findByEmailValue(String email);
 
-    public User save(User user) {
-        User alreadyRegistered = usersByEmail.putIfAbsent(user.getEmail(), user);
-        if (alreadyRegistered != null) {
-            throw new EmailAlreadyInUseException();
-        }
-        return user;
+    boolean existsByEmailValue(String email);
+
+    default Optional<User> findByEmail(Email email) {
+        return findByEmailValue(email.value());
     }
 
-    public Optional<User> findByEmail(Email email) {
-        return Optional.ofNullable(usersByEmail.get(email));
+    default boolean existsByEmail(Email email) {
+        return existsByEmailValue(email.value());
     }
 }

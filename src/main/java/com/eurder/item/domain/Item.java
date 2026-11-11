@@ -1,22 +1,38 @@
 package com.eurder.item.domain;
 
+import com.eurder.customer.domain.Customer;
 import com.eurder.shared.InvalidInputException;
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
 import static com.eurder.shared.Validation.requireText;
 import static com.eurder.shared.Validation.requireValue;
 
+@Entity
+@Table(name = "item")
 public class Item {
 
     private static final int MAX_DESCRIPTION_LENGTH = 255;
 
-    private final UUID id;
-    private final String name;
-    private final String description;
-    private final Price price;
+    @Id
+    private UUID id;
+
+    private String name;
+
+    private String description;
+
+    @Embedded
+    @AttributeOverride(name = "amount", column = @Column(name = "price"))
+    private Price price;
 
     private int stock;
+
+    @Version
+    private Long version;
+
+    protected Item() {
+    }
 
     public Item(String name, String description, Price price, Integer stock) {
         this.id = UUID.randomUUID();
@@ -72,5 +88,18 @@ public class Item {
 
     public int getStock() {
         return stock;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        return other instanceof Item that && id.equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

@@ -1,5 +1,6 @@
 package com.eurder.customer.service;
 
+import com.eurder.PersistenceTest;
 import com.eurder.customer.domain.Customer;
 import com.eurder.customer.domain.CustomerRepository;
 import com.eurder.security.EmailAlreadyInUseException;
@@ -8,36 +9,48 @@ import com.eurder.security.User;
 import com.eurder.security.UserRepository;
 import com.eurder.shared.Email;
 import com.eurder.shared.InvalidInputException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Locale;
 import java.util.UUID;
 
-import static com.eurder.customer.domain.CustomerTestData.aCustomer;
+import static com.eurder.EurderTestClient.uniqueEmail;
 import static com.eurder.customer.domain.CustomerTestData.aCustomerWithEmail;
 import static com.eurder.security.TestPasswordEncoder.FAST_BCRYPT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@PersistenceTest
 class CustomerServiceTest {
 
-    private final CustomerRepository customerRepository = new CustomerRepository();
-    private final UserRepository userRepository = new UserRepository();
-    private final CustomerService customerService =
-            new CustomerService(customerRepository, userRepository, FAST_BCRYPT);
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    private CustomerService customerService;
+
+    @BeforeEach
+    void setUp() {
+        customerService = new CustomerService(customerRepository, userRepository, FAST_BCRYPT);
+    }
 
     @Test
     void registerCustomer_savesAndReturnsTheCustomer() {
-        Customer customer = aCustomer();
+        Customer customer = aCustomerWithEmail(uniqueEmail());
 
         Customer registered = customerService.registerCustomer(customer, "aSecret");
 
-        assertThat(registered).isSameAs(customer);
-        assertThat(customerRepository.findById(customer.getId())).containsSame(customer);
+        assertThat(registered).isEqualTo(customer);
+        assertThat(customerRepository.findById(customer.getId())).contains(customer);
     }
 
     @Test
     void registerCustomer_createsAUserThatCanLogIn_withTheSameIdAndCustomerRole() {
-        Customer customer = aCustomer();
+        Customer customer = aCustomerWithEmail(uniqueEmail());
 
         customerService.registerCustomer(customer, "aSecret");
 
@@ -49,9 +62,10 @@ class CustomerServiceTest {
 
     @Test
     void registerCustomer_withAnEmailAlreadyInUse_isRejected_andSavesNoCustomer() {
-        userRepository.save(User.create(UUID.randomUUID(), new Email("admin@eurder.com"),
-                "adminSecret", Role.ADMIN, FAST_BCRYPT));
-        Customer customer = aCustomerWithEmail("ADMIN@eurder.com");
+        String existingEmail = uniqueEmail();
+        userRepository.save(User.create(UUID.randomUUID(), new Email(existingEmail),
+                "otherSecret", Role.CUSTOMER, FAST_BCRYPT));
+        Customer customer = aCustomerWithEmail(existingEmail.toUpperCase(Locale.ROOT));
 
         assertThatThrownBy(() -> customerService.registerCustomer(customer, "aSecret"))
                 .isInstanceOf(EmailAlreadyInUseException.class);
@@ -60,7 +74,7 @@ class CustomerServiceTest {
 
     @Test
     void registerCustomer_withoutPassword_isRejected_andSavesNothing() {
-        Customer customer = aCustomer();
+        Customer customer = aCustomerWithEmail(uniqueEmail());
 
         assertThatThrownBy(() -> customerService.registerCustomer(customer, "  "))
                 .isInstanceOf(InvalidInputException.class)

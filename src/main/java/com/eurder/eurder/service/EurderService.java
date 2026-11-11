@@ -9,6 +9,7 @@ import com.eurder.shared.InvalidInputException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDate;
@@ -33,6 +34,7 @@ public class EurderService {
         this.clock = clock;
     }
 
+    @Transactional
     public Eurder placeEurder(UUID customerId, List<ItemGroupRequest> itemGroupRequests) {
         LocalDate orderDate = LocalDate.now(clock);
 

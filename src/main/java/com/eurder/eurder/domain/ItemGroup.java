@@ -3,12 +3,14 @@ package com.eurder.eurder.domain;
 import com.eurder.item.domain.Item;
 import com.eurder.item.domain.Price;
 import com.eurder.shared.InvalidInputException;
+import jakarta.persistence.Embeddable;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 import static com.eurder.shared.Validation.requireValue;
 
+@Embeddable
 public record ItemGroup(UUID itemId, String itemName, Price unitPrice, int amount, LocalDate shippingDate) {
 
     private static final int DAYS_TO_SHIP_WHEN_IN_STOCK = 1;

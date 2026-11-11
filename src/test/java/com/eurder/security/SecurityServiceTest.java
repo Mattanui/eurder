@@ -1,8 +1,10 @@
 package com.eurder.security;
 
+import com.eurder.PersistenceTest;
 import com.eurder.shared.Email;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -12,17 +14,21 @@ import static com.eurder.security.TestPasswordEncoder.FAST_BCRYPT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@PersistenceTest
 class SecurityServiceTest {
 
-    private final UserRepository userRepository = new UserRepository();
-    private final SecurityService securityService = new SecurityService(userRepository, FAST_BCRYPT);
+    @Autowired
+    private UserRepository userRepository;
+
+    private SecurityService securityService;
 
     private User admin;
     private User customer;
 
     @BeforeEach
     void setUp() {
-        admin = userRepository.save(User.create(UUID.randomUUID(), new Email("admin@eurder.com"),
+        securityService = new SecurityService(userRepository, FAST_BCRYPT);
+        admin = userRepository.save(User.create(UUID.randomUUID(), new Email("test.admin@eurder.com"),
                 "adminSecret", Role.ADMIN, FAST_BCRYPT));
         customer = userRepository.save(User.create(UUID.randomUUID(), new Email("jimmy@dhemail.com"),
                 "customerSecret", Role.CUSTOMER, FAST_BCRYPT));
@@ -30,14 +36,14 @@ class SecurityServiceTest {
 
     @Test
     void validateAccess_withAnAuthorizedUser_returnsThatUser() {
-        User user = securityService.validateAccess(basicHeader("admin@eurder.com:adminSecret"), Feature.CREATE_ITEM);
+        User user = securityService.validateAccess(basicHeader("test.admin@eurder.com:adminSecret"), Feature.CREATE_ITEM);
 
         assertThat(user).isSameAs(admin);
     }
 
     @Test
     void validateAccess_withEmailInAnotherCase_authenticatesTheUser() {
-        User user = securityService.validateAccess(basicHeader("ADMIN@Eurder.com:adminSecret"), Feature.CREATE_ITEM);
+        User user = securityService.validateAccess(basicHeader("TEST.ADMIN@Eurder.com:adminSecret"), Feature.CREATE_ITEM);
 
         assertThat(user).isSameAs(admin);
     }
@@ -59,7 +65,7 @@ class SecurityServiceTest {
     @Test
     void validateAccess_withWrongPassword_isUnauthorized() {
         assertThatThrownBy(() -> securityService.validateAccess(
-                basicHeader("admin@eurder.com:wrongPassword"), Feature.CREATE_ITEM))
+                basicHeader("test.admin@eurder.com:wrongPassword"), Feature.CREATE_ITEM))
                 .isInstanceOf(UnauthorizedException.class)
                 .hasMessageStartingWith("Wrong password");
     }

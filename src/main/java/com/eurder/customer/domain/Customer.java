@@ -1,20 +1,41 @@
 package com.eurder.customer.domain;
 
 import com.eurder.shared.Email;
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
 import static com.eurder.shared.Validation.requireText;
 import static com.eurder.shared.Validation.requireValue;
 
+@Entity
+@Table(name = "customer")
 public class Customer {
 
-    private final UUID id;
-    private final String firstName;
-    private final String lastName;
-    private final Email email;
-    private final Address address;
-    private final PhoneNumber phoneNumber;
+    @Id
+    private UUID id;
+
+    private String firstName;
+
+    private String lastName;
+
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "email"))
+    private Email email;
+
+    @Embedded
+    private Address address;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "countryCode", column = @Column(name = "phone_country_code")),
+            @AttributeOverride(name = "number", column = @Column(name = "phone_number"))
+    })
+    private PhoneNumber phoneNumber;
+
+    protected Customer() {
+
+    }
 
     public Customer(String firstName, String lastName, Email email, Address address, PhoneNumber phoneNumber) {
         this.id = UUID.randomUUID();
@@ -47,5 +68,18 @@ public class Customer {
 
     public PhoneNumber getPhoneNumber() {
         return phoneNumber;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        return other instanceof Customer that && id.equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

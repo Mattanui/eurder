@@ -1,11 +1,13 @@
 package com.eurder.item.domain;
 
 import com.eurder.shared.InvalidInputException;
+import jakarta.persistence.Embeddable;
 
 import java.math.BigDecimal;
 
 import static com.eurder.shared.Validation.requireValue;
 
+@Embeddable
 public record Price(BigDecimal amount) {
 
     private static final int DECIMALS = 2;
