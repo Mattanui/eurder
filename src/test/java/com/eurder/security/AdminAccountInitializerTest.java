@@ -21,4 +21,17 @@ class AdminAccountInitializerTest {
         assertThat(admin.getRole()).isEqualTo(Role.ADMIN);
         assertThat(admin.passwordMatches("adminSecret", FAST_BCRYPT)).isTrue();
     }
+
+    @Test
+    void run_whenTheAdminAlreadyExists_keepsTheExistingAccount() {
+        UserRepository userRepository = new UserRepository();
+        AdminAccountInitializer initializer =
+                new AdminAccountInitializer(userRepository, FAST_BCRYPT, "admin@eurder.com", "adminSecret");
+        initializer.run(new DefaultApplicationArguments());
+        User firstAdmin = userRepository.findByEmail(new Email("admin@eurder.com")).orElseThrow();
+
+        initializer.run(new DefaultApplicationArguments());
+
+        assertThat(userRepository.findByEmail(new Email("admin@eurder.com")).orElseThrow()).isSameAs(firstAdmin);
+    }
 }

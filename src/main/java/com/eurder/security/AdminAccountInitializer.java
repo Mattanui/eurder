@@ -32,7 +32,12 @@ public class AdminAccountInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        User admin = User.create(UUID.randomUUID(), new Email(adminEmail), adminPassword, Role.ADMIN, passwordEncoder);
+        Email email = new Email(adminEmail);
+        if (userRepository.findByEmail(email).isPresent()) {
+            log.info("Admin account already exists, nothing to create");
+            return;
+        }
+        User admin = User.create(UUID.randomUUID(), email, adminPassword, Role.ADMIN, passwordEncoder);
         userRepository.save(admin);
         log.info("Admin account created with id {}", admin.getId());
     }
